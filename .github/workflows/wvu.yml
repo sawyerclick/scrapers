@@ -1,4 +1,4 @@
-name: Scrape latest data
+name: Scrape WVU COVID-19 data
 
 on:
   push:
