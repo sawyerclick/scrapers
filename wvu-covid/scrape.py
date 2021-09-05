@@ -12,7 +12,8 @@ from datetime import datetime as dt
 # !pip install -r requirements.txt
 # !pip freeze > requirements.txt
 
-response = requests.get('https://www.wvu.edu/return-to-campus/daily-test-results/morgantown/all')
+site = 'https://www.wvu.edu/return-to-campus/daily-test-results/morgantown/all'
+response = requests.get(site)
 dupeSpacesRemoved = re.sub(r"\s\s+", "", response.text)
 lineSplit = "".join(line.strip() for line in dupeSpacesRemoved.split('\n')) ## remove newlines
 soup = BeautifulSoup(lineSplit, 'html.parser')
