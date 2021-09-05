@@ -48,5 +48,5 @@ for table in tables:
       'data': data
   }
 
-  with open(f'{slug}.json', 'w') as file:
+  with open(f'wvu-covid/{slug}.json', 'w') as file:
     json.dump(formatted, file)
