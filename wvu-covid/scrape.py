@@ -4,6 +4,7 @@ Scrape the COVID-19 tracking tables from VWU
 """
 import json
 import requests
+import numpy as np
 from slugify import slugify
 from bs4 import BeautifulSoup
 from datetime import datetime as dt
@@ -30,7 +31,12 @@ def tr_no_bg(css_class):
 def extract_tr(row, headers):
   parsed = {}
   for idx,header in enumerate(headers):
-    parsed[header] = row.contents[idx].find('time')['datetime'] if row.contents[idx].find('time') not in [-1, None] else row.contents[idx].string
+    td = row.contents[idx]
+    if td.find('time') not in [-1, None]: ## is date
+      parsed[header] = td.find('time')['datetime']
+    else: ## not date
+      string = td.string.strip()
+      parsed[header] = np.NaN if string in ['-',''] else float(string.replace('%',''))
   return parsed
 
 ## iterate through all tables on page
