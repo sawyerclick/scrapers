@@ -2,9 +2,9 @@
 """
 Scrape the COVID-19 tracking tables from VWU
 """
+import re
 import json
 import requests
-import numpy as np
 from slugify import slugify
 from bs4 import BeautifulSoup
 from datetime import datetime as dt
@@ -13,8 +13,9 @@ from datetime import datetime as dt
 # !pip freeze > requirements.txt
 
 response = requests.get('https://www.wvu.edu/return-to-campus/daily-test-results/morgantown/all')
-split = "".join(line.strip() for line in response.text.split('\n')) ## remove newlines
-soup = BeautifulSoup(split)
+dupeSpacesRemoved = re.sub(r"\s\s+", "", response.text)
+lineSplit = "".join(line.strip() for line in dupeSpacesRemoved.split('\n')) ## remove newlines
+soup = BeautifulSoup(lineSplit, 'html.parser')
 
 ## find the data tables on the page
 tables = soup.findAll('table')
@@ -29,6 +30,7 @@ def tr_no_bg(css_class):
 ## grab data from tr
 #### iteratively preserve column name in obj
 def extract_tr(row, headers):
+  print(row.contents)
   parsed = {}
   for idx,header in enumerate(headers):
     td = row.contents[idx]
@@ -36,7 +38,7 @@ def extract_tr(row, headers):
       parsed[header] = td.find('time')['datetime']
     else: ## not date
       string = td.string.strip()
-      parsed[header] = np.NaN if string in ['-',''] else float(string.replace('%',''))
+      parsed[header] = None if string in ['-',''] else float(string.replace('%',''))
   return parsed
 
 ## iterate through all tables on page
@@ -44,7 +46,7 @@ for table in tables:
   title = table.previous.find('caption').contents[0]
   slug = slugify(title)
   description = table.previous.find('caption').contents[1].text
-  headers = [th.text for th in table.findAll('th', class_='background-blue-grey')] if table.findAll('th', class_='background-blue-grey') else [th.text for th in table.findAll('th', class_='background-yellow')]
+  headers = [th.text for th in table.findAll('th', class_='background-blue-grey')] if table.find('th', class_='background-blue-grey') else [th.text for th in table.findAll('th', class_='background-yellow')]
   rows = table.findAll('tr', class_=tr_no_bg)
   data = [extract_tr(row, headers) for row in rows]
   formatted = {
