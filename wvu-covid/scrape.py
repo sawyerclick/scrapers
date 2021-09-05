@@ -14,9 +14,9 @@ from datetime import datetime as dt
 
 site = 'https://www.wvu.edu/return-to-campus/daily-test-results/morgantown/all'
 response = requests.get(site)
-dupeSpacesRemoved = re.sub(r"\s\s+", "", response.text)
-lineSplit = "".join(line.strip() for line in dupeSpacesRemoved.split('\n')) ## remove newlines
-soup = BeautifulSoup(lineSplit, 'html.parser')
+dupe_spaces_removed = re.sub(r"\s\s+", "", response.text)
+line_split = "".join(line.strip() for line in dupe_spaces_removed.split('\n')) ## remove newlines
+soup = BeautifulSoup(line_split, 'html.parser')
 
 ## find the data tables on the page
 tables = soup.findAll('table')
@@ -24,9 +24,9 @@ tables = soup.findAll('table')
 ## ensure tr is not a header
 #### headers have bg and are not border-left
 def tr_no_bg(css_class):
-    notHeader = css_class not in ['background-yellow','background-blue-grey']
-    hasBorderLeft = css_class == 'border-left'
-    return notHeader and hasBorderLeft
+    not_header = css_class not in ['background-yellow','background-blue-grey']
+    has_border_left = css_class == 'border-left'
+    return not_header and has_border_left
 
 ## grab data from tr
 #### iteratively preserve column name in obj
