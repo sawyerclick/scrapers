@@ -1,4 +1,4 @@
-name: Scrape SFChronicle.com headlines
+name: Scrape data
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: '0,15,30,45 * * * *'
+    - cron: '4,14,24,34,44,54 * * * *'
 
 jobs:
   scheduled:
@@ -28,7 +28,9 @@ jobs:
     - name: Install python packages
       run: |
         pip install -r requirements.txt
-    - name: Execute script
+    - name: Execute WVU covid script
+      run: python wvu-covid/scrape.py
+    - name: Execute SFChron headlines script
       run: python headlines/sfchron/scrape.py
     - name: Commit files
       run: |
